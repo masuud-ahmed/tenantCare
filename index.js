@@ -417,9 +417,6 @@ app.post('/api/properties/:property_id/request', verifyToken, async (req, res) =
 
 // Tenant view all available properties
 app.get('/api/properties', async (req, res) => {
-  if (!req.tenant) {
-    return res.status(401).json({ error: 'Authentication required' });
-  }
 
   try {
     const properties = await runQuery('SELECT * FROM properties WHERE availability = 1');
