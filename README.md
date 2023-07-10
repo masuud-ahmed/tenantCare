@@ -282,6 +282,38 @@ Retrieve a list of all available properties.
 ]
 ```
 
+### Get Available Property by ID
+
+Retrieve a single available property by its ID.
+
+**Endpoint:** `GET /api/properties/:property_id`
+
+#### Request Parameters
+
+| Parameter       | Type    | Required | Description                              |
+| --------------- | ------- | -------- | ---------------------------------------- |
+| `property_id`   | integer | Yes      | ID of the property to retrieve.          |
+
+#### Response
+
+```json
+{
+  "id": 1,
+  "landlord_id": 1,
+  "title": "Property 1",
+  "description": "Description of Property 1",
+  "address": "123 Main St",
+  "rent_fee": 1000,
+  "availability": 1,
+  "image": "https://example.com/property1.jpg"
+}
+```
+
+#### Error Responses
+
+- `Property not found or not available`: The requested property does not exist or is not currently available.
+- `An error occurred`: An internal server error occurred.
+
 ## Error Responses
 
 If an error occurs, the API will respond with an appropriate HTTP status code and an error message in the response body.
@@ -293,6 +325,7 @@ Example error response:
   "error": "Invalid email or password"
 }
 ```
+
 
 Possible error messages:
 
