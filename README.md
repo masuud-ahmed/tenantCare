@@ -2,7 +2,7 @@
 
 This API uses JSON Web Tokens (JWT) for authentication. To access protected endpoints, include the `Authorization` header in your requests with the value `Bearer <token>`, where `<token>` is the JWT obtained during the login process.
 
-``BASE_URL = ``
+``BASE_URL = https://tenantcare-8f0d118ae3dc.herokuapp.com``
 
 ### Landlord Sign Up
 
