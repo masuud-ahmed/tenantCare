@@ -416,7 +416,7 @@ app.post('/api/properties/:property_id/request', verifyToken, async (req, res) =
 });
 
 // Tenant view all available properties
-app.get('/api/properties', verifyToken, async (req, res) => {
+app.get('/api/properties', async (req, res) => {
   if (!req.tenant) {
     return res.status(401).json({ error: 'Authentication required' });
   }
@@ -430,6 +430,25 @@ app.get('/api/properties', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'An error occurred' });
   }
 });
+
+// Endpoint to get a single available property by ID
+app.get('/api/properties/:property_id', async (req, res) => {
+    const { property_id } = req.params;
+  
+    try {
+      const property = await runQuery('SELECT * FROM properties WHERE id = ? AND availability = 1', [property_id]);
+  
+      if (property.length === 0) {
+        return res.status(404).json({ error: 'Property not found or not available' });
+      }
+  
+      res.json(property[0]);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'An error occurred' });
+    }
+  });
+  
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
