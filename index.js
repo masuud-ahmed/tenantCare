@@ -101,7 +101,11 @@ function verifyToken(req, res, next) {
       return res.status(401).json({ error: 'Invalid token' });
     }
 
+    if (decoded.role === 'tenant') {
+    req.tenant = decoded;
+    } else if (decoded.role === 'landlord') {
     req.landlord = decoded;
+    }
     next();
   });
 }
@@ -445,6 +449,146 @@ app.get('/api/properties/:property_id', async (req, res) => {
       res.status(500).json({ error: 'An error occurred' });
     }
   });
+
+  // Tenant profile
+app.get('/api/tenants/profile', verifyToken, async (req, res) => {
+  if (!req.tenant) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  try {
+    const tenant = await runQuery('SELECT * FROM tenants WHERE id = ?', [req.tenant.id]);
+
+    if (tenant.length === 0) {
+      return res.status(404).json({ error: 'Tenant not found' });
+    }
+
+    res.json(tenant[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
+// Tenant update profile
+app.put('/api/tenants/update_profile', verifyToken, async (req, res) => {
+  if (!req.tenant) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  const { first_name, last_name, email } = req.body;
+  const tenant_id = req.tenant.id;
+
+  try {
+    const existingTenant = await runQuery('SELECT * FROM tenants WHERE email = ? AND id != ?', [email, tenant_id]);
+
+    if (existingTenant.length > 0) {
+      return res.status(400).json({ error: 'Tenant with the same email already exists' });
+    }
+
+    await runQuery('UPDATE tenants SET first_name = ?, last_name = ?, email = ? WHERE id = ?', [
+      first_name,
+      last_name,
+      email,
+      tenant_id
+    ]);
+
+    res.json({ message: 'Tenant profile updated successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
+// Tenant delete profile
+app.delete('/api/tenants/delete_profile', verifyToken, async (req, res) => {
+  if (!req.tenant) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  const tenant_id = req.tenant.id;
+
+  try {
+    await runQuery('DELETE FROM tenants WHERE id = ?', [tenant_id]);
+
+    res.json({ message: 'Tenant profile deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
+// Landlord profile
+app.get('/api/landlords/profile', verifyToken, async (req, res) => {
+  if (!req.landlord) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  try {
+    const landlord = await runQuery('SELECT * FROM landlords WHERE id = ?', [req.landlord.id]);
+
+    if (landlord.length === 0) {
+      return res.status(404).json({ error: 'Landlord not found' });
+    }
+
+    res.json(landlord[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
+// Landlord update profile
+app.put('/api/landlords/update_profile', verifyToken, async (req, res) => {
+  if (!req.landlord) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  const { first_name, last_name, email } = req.body;
+  const landlord_id = req.landlord.id;
+
+  try {
+    const existingLandlord = await runQuery('SELECT * FROM landlords WHERE email = ? AND id != ?', [
+      email,
+      landlord_id
+    ]);
+
+    if (existingLandlord.length > 0) {
+      return res.status(400).json({ error: 'Landlord with the same email already exists' });
+    }
+
+    await runQuery('UPDATE landlords SET first_name = ?, last_name = ?, email = ? WHERE id = ?', [
+      first_name,
+      last_name,
+      email,
+      landlord_id
+    ]);
+
+    res.json({ message: 'Landlord profile updated successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
+// Landlord delete profile
+app.delete('/api/landlords/delete_profile', verifyToken, async (req, res) => {
+  if (!req.landlord) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  const landlord_id = req.landlord.id;
+
+  try {
+    await runQuery('DELETE FROM landlords WHERE id = ?', [landlord_id]);
+
+    res.json({ message: 'Landlord profile deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
   
 
 app.listen(port, () => {
