@@ -309,6 +309,66 @@ Retrieve a single available property by its ID.
 }
 ```
 
+#### Tenant Profile
+
+- Endpoint: `GET /api/tenants/profile`
+- Description: Retrieves the profile information of the currently logged-in tenant.
+- Authorization: Required
+
+#### Update Tenant Profile
+
+- Endpoint: `PUT /api/tenants/update_profile`
+- Description: Updates the profile information of the currently logged-in tenant.
+- Authorization: Required
+- Request Body:
+
+  ```json
+  {
+    "first_name": "John",
+    "last_name": "Doe",
+    "email": "john.doe@example.com"
+  }
+  ```
+
+#### Delete Tenant Account
+
+- Endpoint: `DELETE /api/tenants/delete_profile`
+- Description: Deletes the account of the currently logged-in tenant.
+- Authorization: Required
+
+### Landlord Endpoints
+
+#### Landlord Profile
+
+- Endpoint: `GET /api/landlords/profile`
+- Description: Retrieves the profile information of the currently logged-in landlord.
+- Authorization: Required
+
+#### Update Landlord Profile
+
+- Endpoint: `PUT /api/landlords/update_profile`
+- Description: Updates the profile information of the currently logged-in landlord.
+- Authorization: Required
+- Request Body:
+
+  ```json
+  {
+    "first_name": "John",
+    "last_name": "Doe",
+    "email": "john.doe@example.com"
+  }
+  ```
+
+#### Delete Landlord Account
+
+- Endpoint: `DELETE /api/landlords/delete_profile`
+- Description: Deletes the account of the currently logged-in landlord.
+- Authorization: Required
+
+Please note that the endpoints marked with "Authorization: Required" require authentication with a valid JWT token in the request headers.
+
+For the complete list of endpoints and their descriptions, please refer to the code provided.
+
 #### Error Responses
 
 - `Property not found or not available`: The requested property does not exist or is not currently available.
