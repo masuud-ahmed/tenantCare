@@ -326,6 +326,77 @@ app.post('/api/properties/:property_id/approve', verifyToken, async (req, res) =
   }
 });
 
+app.get('/api/tenants/approved_properties', verifyToken, async (req, res) => {
+  if (!req.tenant) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  const tenant_id = req.tenant.id;
+
+  try {
+    const properties = await runQuery(`
+      SELECT p.*, l.first_name AS landlord_first_name, l.last_name AS landlord_last_name
+      FROM properties p
+      JOIN tenant_properties tp ON tp.property_id = p.id
+      JOIN landlords l ON p.landlord_id = l.id
+      WHERE tp.tenant_id = ?
+    `, [tenant_id]);
+
+    res.json(properties);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
+
+app.get('/api/landlords/requests_to_approve', verifyToken, async (req, res) => {
+  if (!req.landlord) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  const landlord_id = req.landlord.id;
+
+  try {
+    const requests = await runQuery(`
+      SELECT r.*, t.first_name AS tenant_first_name, t.last_name AS tenant_last_name
+      FROM property_requests r
+      JOIN tenants t ON r.tenant_id = t.id
+      JOIN properties p ON r.property_id = p.id
+      WHERE p.landlord_id = ?
+    `, [landlord_id]);
+
+    res.json(requests);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
+app.get('/api/landlords/approved_requests', verifyToken, async (req, res) => {
+  if (!req.landlord) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  const landlord_id = req.landlord.id;
+
+  try {
+    const approvedRequests = await runQuery(`
+      SELECT tp.*, t.first_name AS tenant_first_name, t.last_name AS tenant_last_name
+      FROM tenant_properties tp
+      JOIN tenants t ON tp.tenant_id = t.id
+      JOIN properties p ON tp.property_id = p.id
+      WHERE p.landlord_id = ?
+    `, [landlord_id]);
+
+    res.json(approvedRequests);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
+
 // Tenant sign up
 app.post('/api/tenants/signup', async (req, res) => {
   const { first_name, last_name, email, password } = req.body;
