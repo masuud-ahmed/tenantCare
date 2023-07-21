@@ -309,7 +309,7 @@ app.post('/api/properties/:property_id/approve', verifyToken, async (req, res) =
     );
 
     if (requestResult.length === 0) {
-      return res.status(404).json({ error: 'Property request not found' });
+      return res.status(404).json({ error: 'Property request not found', result: requestResult });
     }
 
     await runQuery('DELETE FROM property_requests WHERE id = ?', [requestResult[0].id]);
