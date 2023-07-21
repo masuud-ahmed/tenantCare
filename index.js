@@ -335,11 +335,13 @@ app.get('/api/tenants/approved_properties', verifyToken, async (req, res) => {
 
   try {
     const properties = await runQuery(`
-      SELECT p.*, l.first_name AS landlord_first_name, l.last_name AS landlord_last_name
-      FROM properties p
-      JOIN tenant_properties tp ON tp.property_id = p.id
+      SELECT tp.*, p.title AS property_title, p.description AS property_description,
+      p.address AS property_address, p.rent_fee AS property_rent_fee, p.availability AS property_availability,
+      l.first_name AS landlord_first_name, l.last_name AS landlord_last_name
+      FROM tenant_properties tp
+      JOIN properties p ON tp.property_id = p.id
       JOIN landlords l ON p.landlord_id = l.id
-      WHERE tp.tenant_id = ?
+      WHERE tp.tenant_id = ? AND tp.approved = 1
     `, [tenant_id]);
 
     res.json(properties);
@@ -359,7 +361,9 @@ app.get('/api/landlords/requests_to_approve', verifyToken, async (req, res) => {
 
   try {
     const requests = await runQuery(`
-      SELECT r.*, t.first_name AS tenant_first_name, t.last_name AS tenant_last_name
+      SELECT r.*, t.first_name AS tenant_first_name, t.last_name AS tenant_last_name,
+      p.id AS property_id, p.title AS property_title, p.description AS property_description,
+      p.address AS property_address, p.rent_fee AS property_rent_fee, p.availability AS property_availability
       FROM property_requests r
       JOIN tenants t ON r.tenant_id = t.id
       JOIN properties p ON r.property_id = p.id
@@ -373,6 +377,7 @@ app.get('/api/landlords/requests_to_approve', verifyToken, async (req, res) => {
   }
 });
 
+
 app.get('/api/landlords/approved_requests', verifyToken, async (req, res) => {
   if (!req.landlord) {
     return res.status(401).json({ error: 'Authentication required' });
@@ -382,7 +387,9 @@ app.get('/api/landlords/approved_requests', verifyToken, async (req, res) => {
 
   try {
     const approvedRequests = await runQuery(`
-      SELECT tp.*, t.first_name AS tenant_first_name, t.last_name AS tenant_last_name
+      SELECT tp.*, t.first_name AS tenant_first_name, t.last_name AS tenant_last_name,
+      p.id AS property_id, p.title AS property_title, p.description AS property_description,
+      p.address AS property_address, p.rent_fee AS property_rent_fee, p.availability AS property_availability
       FROM tenant_properties tp
       JOIN tenants t ON tp.tenant_id = t.id
       JOIN properties p ON tp.property_id = p.id
