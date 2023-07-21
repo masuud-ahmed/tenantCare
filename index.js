@@ -312,12 +312,12 @@ app.post('/api/properties/:property_id/approve', verifyToken, async (req, res) =
       return res.status(404).json({ error: 'Property request not found', result: requestResult });
     }
 
-    await runQuery('DELETE FROM property_requests WHERE id = ?', [requestResult[0].id]);
-
     await runQuery(
       'INSERT INTO tenant_properties (tenant_id, property_id) VALUES (?, ?)',
       [tenant_id, property_id]
     );
+
+    await runQuery('DELETE FROM property_requests WHERE id = ?', [requestResult[0].id]);
 
     res.json({ message: 'Request approved successfully' });
   } catch (error) {
@@ -501,8 +501,8 @@ app.post('/api/properties/:property_id/request', verifyToken, async (req, res) =
 app.get('/api/properties', async (req, res) => {
 
   try {
-    const properties = await runQuery('SELECT * FROM properties WHERE availability = 1');
-
+    
+    const properties = await runQuery('SELECT * FROM properties');
     res.json(properties);
   } catch (error) {
     console.error(error);
