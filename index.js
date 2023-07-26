@@ -312,12 +312,12 @@ app.post('/api/properties/:property_id/approve', verifyToken, async (req, res) =
       return res.status(404).json({ error: 'Property request not found', result: requestResult });
     }
 
+    await runQuery('DELETE FROM property_requests WHERE id = ?', [requestResult[0].id]);
+
     await runQuery(
       'INSERT INTO tenant_properties (tenant_id, property_id) VALUES (?, ?)',
       [tenant_id, property_id]
     );
-
-    await runQuery('DELETE FROM property_requests WHERE id = ?', [requestResult[0].id]);
 
     res.json({ message: 'Request approved successfully' });
   } catch (error) {
@@ -341,7 +341,7 @@ app.get('/api/tenants/approved_properties', verifyToken, async (req, res) => {
       FROM tenant_properties tp
       JOIN properties p ON tp.property_id = p.id
       JOIN landlords l ON p.landlord_id = l.id
-      WHERE tp.tenant_id = ? AND tp.approved = 1
+      WHERE tp.tenant_id = ?
     `, [tenant_id]);
 
     res.json(properties);
