@@ -404,7 +404,7 @@ app.get('/api/landlords/approved_requests', verifyToken, async (req, res) => {
 });
 
 
-// Tenant sign up
+// Tenant`s sign up
 app.post('/api/tenants/signup', async (req, res) => {
   const { first_name, last_name, email, password } = req.body;
   try {
