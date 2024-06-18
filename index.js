@@ -7,13 +7,13 @@ const jwt = require('jsonwebtoken');
 const app = express();
 const sqlite3 = require('sqlite3').verbose();
 
-// Add body-parser middleware
+// Add body-parser middleware to it
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(cors());
 
-// Connect to the SQLite database
+// Connect it to the SQLite database
 const db = new sqlite3.Database('./database.sqlite');
 
 const port = process.env.PORT || 9001;
@@ -81,7 +81,7 @@ function runQuery(query, params = []) {
   });
 }
 
-// Helper function to generate JWT token
+// Helper function to generate the JWT token
 function generateToken(payload) {
   return jwt.sign(payload, secretKey, { expiresIn: '1h' });
 }
